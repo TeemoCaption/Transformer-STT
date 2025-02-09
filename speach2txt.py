@@ -354,3 +354,16 @@ class Transformer(keras.Model):
 
         return dec_input
 
+path = "./dataset/"
+# 獲取所有的wav文件，recursive 表示是否進行遞迴搜尋
+wavs = glob(path + "wav/*.wav", recursive=True)
+
+id2text = {}
+with open(os.path.join(path, "metadata.csv"), encoding="utf-8") as f:
+    for line in f:
+        id = line.strip("|")[0]
+        text = line.strip("|")[2]
+        id2text[id] = text
+        
+print(wavs[0])
+        
