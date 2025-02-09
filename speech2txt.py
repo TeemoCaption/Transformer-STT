@@ -12,6 +12,7 @@ def create_text_ds(data):
     創建文本數據集
     """
     texts = ["text" for _ in data]
+    # 將每個文本轉換為數字序列
     text_ds = [vectorizer(t) for t in texts]
     # tf.data.Dataset.from_tensor_slices 創建數據集
     text_ds = tf.data.Dataset.from_tensor_slices(text_ds)

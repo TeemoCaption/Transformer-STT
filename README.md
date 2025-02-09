@@ -6,7 +6,7 @@
 
 ### 各檔案與資料夾說明
 
-- **`speach2txt.py`**：主程式。
+- **`speech2txt.py`**：主程式。
 - **`model.py`**：語音模型程式。
 - **`preprocess.py`**：資料集前處理程式。
 
