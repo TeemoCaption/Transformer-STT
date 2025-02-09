@@ -9,8 +9,9 @@ from tensorflow.keras import layers
 class TokenEmbedding(layers.Layer):
     def __init__(self, num_vocab=1000, maxlen=100, num_hid=64):
         """
-        num_vocab: 詞彙表大小
-        maxlen: 輸入序列的最大長度
+        參數：\n
+        num_vocab: 詞彙表大小\n
+        maxlen: 輸入序列的最大長度\n
         num_hid: 詞嵌入的維度
         """
         super().__init__()
@@ -22,6 +23,7 @@ class TokenEmbedding(layers.Layer):
     # 定義呼叫方法
     def call(self, x):
         """
+        參數：\n
         x: 輸入序列
         """
         # 獲取張量 x 的最後一個維度的大小，表示序列的長度
@@ -40,7 +42,8 @@ class TokenEmbedding(layers.Layer):
 class SpeechFeatureEmbedding(layers.Layer):
     def __init__(self, num_hid=64, maxlen=100):
         """
-        num_hid: 隱藏層的維度
+        參數：\n
+        num_hid: 隱藏層的維度\n
         maxlen: 輸入序列的最大長度
         """
         super().__init__()
@@ -61,6 +64,10 @@ class SpeechFeatureEmbedding(layers.Layer):
 
     # 定義呼叫方法
     def call(self, x):
+        """
+        參數：\n
+        x: 輸入序列
+        """
         x = self.conv1(x)
         x = self.conv2(x)
         return self.conv3(x)
@@ -69,9 +76,10 @@ class SpeechFeatureEmbedding(layers.Layer):
 class TransformerEncoder(layers.Layer):
     def __init__(self, embed_dim, num_heads, feed_forward_dim, rate=0.1):
         """
-        embed_dim: 詞嵌入的維度
-        num_heads: 注意力機制的頭數
-        feed_forward_dim: 前饋神經網路的隱藏層維度
+        參數：\n
+        embed_dim: 詞嵌入的維度\n
+        num_heads: 注意力機制的頭數\n
+        feed_forward_dim: 前饋神經網路的隱藏層維度\n
         rate: dropout比率
         """
         super().__init__()
@@ -94,7 +102,8 @@ class TransformerEncoder(layers.Layer):
     # 定義呼叫方法
     def call(self, inputs, training):
         """
-        inputs: 輸入序列
+        參數：\n
+        inputs: 輸入序列\n
         training: 是否訓練
         """
         attn_output = self.att(inputs, inputs)
@@ -108,9 +117,10 @@ class TransformerEncoder(layers.Layer):
 class TransformerDecoder(layers.Layer):
     def __init__(self, embed_dim, num_heads, feed_forward_dim, dropout_rate=0.1):
         """
-        embed_dim: 詞嵌入的維度
-        num_heads: 注意力機制的頭數
-        feed_forward_dim: 前饋神經網路的隱藏層維度
+        參數：\n
+        embed_dim: 詞嵌入的維度\n
+        num_heads: 注意力機制的頭數\n
+        feed_forward_dim: 前饋神經網路的隱藏層維度\n
         dropout_rate: dropout比率
         """
         super().__init__()
@@ -136,11 +146,11 @@ class TransformerDecoder(layers.Layer):
         """
         遮蔽自注意力中的點積矩陣的上半部分。
         這樣可以防止未來的 token 影響當前的 token。
-        在下三角形中標註 1，從右下角開始計算。
-        
-        batch_size: 批次大小
-        n_dest: 目標序列的長度
-        n_src: 輸入序列的長度
+        在下三角形中標註 1，從右下角開始計算。\n
+        參數：\n
+        batch_size: 批次大小\n
+        n_dest: 目標序列的長度\n
+        n_src: 輸入序列的長度\n
         dtype: 資料類型
         """
         # [:, None] 是在原張量的每一個元素後加上一個新的維度，將其從一維變成了列向量
@@ -161,7 +171,8 @@ class TransformerDecoder(layers.Layer):
     # 定義呼叫方法
     def call(self, enc_out, target):
         """
-        enc_out: 編碼器的輸出
+        參數：\n
+        enc_out: 編碼器的輸出\n
         target: 解碼器的輸入
         """
         input_shape = tf.shape(target)
@@ -199,13 +210,14 @@ class Transformer(keras.Model):
         num_classes=10,
     ):
         """
-        num_hid: 隱藏層的維度
-        num_head: 注意力機制的頭數
-        num_feed_forward: 前饋神經網路的隱藏層維度
-        source_maxlen: 輸入序列的最大長度
-        target_maxlen: 輸出序列的最大長度
-        num_layers_enc: 編碼器的層數
-        num_layers_dec: 解碼器的層數
+        參數：\n
+        num_hid: 隱藏層的維度\n
+        num_head: 注意力機制的頭數\n
+        num_feed_forward: 前饋神經網路的隱藏層維度\n
+        source_maxlen: 輸入序列的最大長度\n
+        target_maxlen: 輸出序列的最大長度\n
+        num_layers_enc: 編碼器的層數\n
+        num_layers_dec: 解碼器的層數\n
         num_classes: 詞彙表的大小
         """
         super().__init__()
@@ -243,7 +255,8 @@ class Transformer(keras.Model):
     # 定義解碼方法
     def decode(self, enc_out, target):
         """
-        enc_out: 編碼器的輸出
+        參數：\n
+        enc_out: 編碼器的輸出\n
         target: 解碼器的輸入
         """
         y = self.dec_input(target)
@@ -256,6 +269,7 @@ class Transformer(keras.Model):
     # 定義呼叫方法
     def call(self, inputs):
         """
+        參數：\n
         inputs: 輸入序列
         """
         # 獲取輸入序列
@@ -274,6 +288,7 @@ class Transformer(keras.Model):
     # 訓練過程中處理每個批次的數據，計算損失，更新模型的權重，以及返回當前的損失值
     def train_step(self, batch):
         """
+        參數：\n
         batch: 一個批次的數據
         """
         source = batch["source"]
@@ -335,7 +350,8 @@ class Transformer(keras.Model):
     # 定義生成方法
     def generate(self, source, target_start_token_idx):
         """
-        source: 輸入序列
+        參數：\n
+        source: 輸入序列\n
         target_start_token_idx: 目標序列的起始標記索引
         """
         bs = tf.shape(source)[0]

@@ -2,7 +2,9 @@
 import os 
 import random
 from glob import glob
-import model
+import model as md
+import preprocess as pre
+
 
 def main():
     path = "./dataset/"
@@ -18,6 +20,14 @@ def main():
             
     #print(wavs[0])
     #print(id2text["LJ001-0001"])
+    
+    # 資料中的所有轉錄本均小於 200 個字符
+    max_target_len = 200  
+    data = pre.get_data(wavs, id2text, maxlen=max_target_len)
+    vectorizer = pre.VectorizeChar(max_target_len)
+    print("Vocab size", len(vectorizer.get_vocabulary()))
+
+    
 
     
 if __name__ == "__main__":
