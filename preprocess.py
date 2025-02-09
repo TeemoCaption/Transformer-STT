@@ -22,7 +22,6 @@ def get_data(wavs, id_to_text, maxlen=50):
 
     return data
 
-
 class VectorizeChar:
     """
     將文本轉換為數字序列（字符的索引值），並控制文本長度
@@ -131,9 +130,9 @@ def create_audio_ds(data):
 def create_tf_dataset(data, vectorizer, bs=4):
     """
     創建數據集\n
-    參數：
-    - data: 數據
-    - vectorizer: 用於文本向量化的實例
+    參數：\n
+    - data: 數據\n
+    - vectorizer: 用於文本向量化的實例\n
     - bs: 批次大小
     """
     audio_ds = create_audio_ds(data)

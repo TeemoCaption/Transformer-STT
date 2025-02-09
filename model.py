@@ -5,6 +5,7 @@ import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras import layers
 
+
 # 對文本進行嵌入處理
 class TokenEmbedding(layers.Layer):
     def __init__(self, num_vocab=1000, maxlen=100, num_hid=64):
@@ -37,6 +38,7 @@ class TokenEmbedding(layers.Layer):
         positions = self.pos_emb(positions)
         # 將詞嵌入和位置編碼的結果相加作為最終的輸出
         return x + positions
+
 
 # 對語音特徵進行嵌入處理
 class SpeechFeatureEmbedding(layers.Layer):
@@ -71,6 +73,7 @@ class SpeechFeatureEmbedding(layers.Layer):
         x = self.conv1(x)
         x = self.conv2(x)
         return self.conv3(x)
+
 
 # 定義Transformer的編碼器
 class TransformerEncoder(layers.Layer):
@@ -113,6 +116,7 @@ class TransformerEncoder(layers.Layer):
         ffn_output = self.dropout2(ffn_output, training=training)
         return self.layernorm2(out1 + ffn_output)
 
+
 # 定義Transformer的解碼器
 class TransformerDecoder(layers.Layer):
     def __init__(self, embed_dim, num_heads, feed_forward_dim, dropout_rate=0.1):
@@ -129,7 +133,9 @@ class TransformerDecoder(layers.Layer):
         self.layernorm2 = layers.LayerNormalization(epsilon=1e-6)
         self.layernorm3 = layers.LayerNormalization(epsilon=1e-6)
         # 多頭注意力機制層
-        self.self_att = layers.MultiHeadAttention(num_heads=num_heads, key_dim=embed_dim)
+        self.self_att = layers.MultiHeadAttention(
+            num_heads=num_heads, key_dim=embed_dim
+        )
         self.enc_att = layers.MultiHeadAttention(num_heads=num_heads, key_dim=embed_dim)
         self.self_dropout = layers.Dropout(0.5)
         self.enc_dropout = layers.Dropout(0.1)
@@ -163,7 +169,9 @@ class TransformerDecoder(layers.Layer):
         mask = tf.reshape(mask, [1, n_dest, n_src])
         # tf.concat是將兩個張量拼接在一起
         # 0 代表沿著第一個維度（即行）進行拼接
-        mult = tf.concat([tf.expand_dims(batch_size, -1), tf.constant([1, 1], dtype=tf.int32)], 0)
+        mult = tf.concat(
+            [tf.expand_dims(batch_size, -1), tf.constant([1, 1], dtype=tf.int32)], 0
+        )
         # tf.tile是將一個張量拓展成多個張量
         # mask：要重複的張量。mult：一個列表或張量，指定每個維度上應該重複的次數。
         return tf.tile(mask, mult)
@@ -183,18 +191,19 @@ class TransformerDecoder(layers.Layer):
         # 生成目標序列的遮蔽
         causal_mask = self.causal_attention_mask(batch_size, seq_len, seq_len, tf.bool)
         target_att = self.self_att(target, target, attention_mask=causal_mask)
-        
+
         target_norm = self.layernorm1(target + target_att)
         target_norm = self.self_dropout(target_norm, training=True)
-        
+
         enc_out_norm = self.layernorm2(enc_out + target_norm)
         enc_out_norm = self.enc_dropout(enc_out_norm, training=True)
-        
+
         ffn_out = self.ffn(enc_out_norm)
         ffn_out_norm = self.layernorm3(ffn_out + enc_out_norm)
         ffn_out_norm = self.ffn_dropout(ffn_out_norm, training=True)
-        
+
         return ffn_out_norm
+
 
 # 定義Transformer模型
 class Transformer(keras.Model):
@@ -232,13 +241,18 @@ class Transformer(keras.Model):
         # 編碼器輸入
         self.enc_input = SpeechFeatureEmbedding(num_hid=num_hid, maxlen=source_maxlen)
         # 解碼器輸入
-        self.dec_input = TokenEmbedding(num_vocab=num_classes, maxlen=target_maxlen, num_hid=num_hid)
+        self.dec_input = TokenEmbedding(
+            num_vocab=num_classes, maxlen=target_maxlen, num_hid=num_hid
+        )
 
         # 編碼器
-        self.encoder = keras.Sequential([self.enc_input] + [
-            TransformerEncoder(num_hid, num_head, num_feed_forward) 
-            for _ in range(num_layers_enc)
-        ])
+        self.encoder = keras.Sequential(
+            [self.enc_input]
+            + [
+                TransformerEncoder(num_hid, num_head, num_feed_forward)
+                for _ in range(num_layers_enc)
+            ]
+        )
 
         # 解碼器
         for i in range(num_layers_dec):
@@ -308,7 +322,7 @@ class Transformer(keras.Model):
             # self.compiled_loss用來計算損失
             # sample_weight 是樣本權重 sample_weight=mask，用來對計算損失時進行加權，用來忽略填充部分（即遮蔽部分）對損失的影響
             loss = self.compiled_loss(one_hot, preds, sample_weight=mask)
-        
+
         # 計算梯度
         gradients = tape.gradient(loss, self.trainable_variables)
         # 更新權重
@@ -369,3 +383,21 @@ class Transformer(keras.Model):
             dec_input = tf.concat([dec_input, last_logit], axis=-1)
 
         return dec_input
+
+
+def DisplayOutputs():
+    def __init__(
+        self, batch, idx2token, target_start_token_idx=27, target_end_token_idx=28 
+    ):
+        """
+        每個 epoch 後顯示一批輸出\n
+        參數：\n
+        batch: 一個批次的數據\n
+        idx2token: 索引到標記的映射\n
+        target_start_token_idx: 目標序列的起始標記索引\n
+        target_end_token_idx: 目標序列的結束標記索引
+        """
+        self.batch = batch
+        self.target_start_token_idx = target_start_token_idx
+        self.target_end_token_idx = target_end_token_idx
+        self.idx2token = idx2token

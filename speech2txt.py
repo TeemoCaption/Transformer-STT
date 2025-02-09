@@ -36,7 +36,9 @@ def main():
     test_data = data[split:]
     ds = pre.create_tf_dataset(train_data, vectorizer, bs=16)
     val_ds = pre.create_tf_dataset(test_data, vectorizer, bs=4)
-    print(train_data[0].keys())
+    #print(train_data[0].keys())
+    #print(train_data[0])
+    #print(type(ds))
     
 if __name__ == "__main__":
     main()    
