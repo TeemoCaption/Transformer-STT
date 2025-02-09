@@ -339,6 +339,7 @@ class Transformer(keras.Model):
         """
         bs = tf.shape(source)[0]
         enc = self.encoder(source)
+        # tf.ones用來生成全為1的張量
         dec_input = tf.ones((bs, 1), dtype=tf.int32) * target_start_token_idx
         dec_logits = []
 
