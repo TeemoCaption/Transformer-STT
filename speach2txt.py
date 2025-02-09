@@ -217,8 +217,9 @@ class Transformer(keras.Model):
         self.target_maxlen = target_maxlen
         self.num_classes = num_classes
 
-        # 編碼器和解碼器輸入
+        # 編碼器輸入
         self.enc_input = SpeechFeatureEmbedding(num_hid=num_hid, maxlen=source_maxlen)
+        # 解碼器輸入
         self.dec_input = TokenEmbedding(num_vocab=num_classes, maxlen=target_maxlen, num_hid=num_hid)
 
         # 編碼器
@@ -227,7 +228,7 @@ class Transformer(keras.Model):
             for _ in range(num_layers_enc)
         ])
 
-        # Decoder
+        # 解碼器
         for i in range(num_layers_dec):
             # setattr 是 Python 的內建函數，用來動態地設置對象的屬性
             # object：要設置屬性的對象。name：要設置的屬性名。value：要設置的屬性值。
@@ -340,6 +341,7 @@ class Transformer(keras.Model):
         bs = tf.shape(source)[0]
         enc = self.encoder(source)
         # tf.ones用來生成全為1的張量
+        # bs 代表批次大小 (batch size)。1 代表初始化的輸入序列長度為 1（解碼器從一個起始標記開始生成）
         dec_input = tf.ones((bs, 1), dtype=tf.int32) * target_start_token_idx
         dec_logits = []
 
