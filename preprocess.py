@@ -16,8 +16,9 @@ def get_data(wavs, id_to_text, maxlen=50):
     #print(maxlen)
     for w in wavs:
         id = os.path.basename(w).split(".")[0]
+        # 如果文本長度小於 maxlen，則將音頻路徑和文本添加到 data 中
         if len(id_to_text[id]) < maxlen:
-            data.append({"音檔路徑": w, "對應文字": id_to_text[id]})
+            data.append({"audio": w, "text": id_to_text[id]})
 
     return data
 
@@ -63,15 +64,17 @@ class VectorizeChar:
     def get_vocabulary(self):
         return self.vocab
     
-def create_text_ds(data):
+def create_text_ds(data, vectorizer):
     """
     創建文本數據集
     """
-    texts = ["text" for _ in data]
+    texts = [d["text"] for d in data]  # 取得每條數據的文本
     # 將每個文本轉換為數字序列
     text_ds = [vectorizer(t) for t in texts]
     # tf.data.Dataset.from_tensor_slices 創建數據集
     text_ds = tf.data.Dataset.from_tensor_slices(text_ds)
+    return text_ds
+
     return text_ds
 
 def path_to_audio(path):
@@ -125,15 +128,16 @@ def create_audio_ds(data):
     )
     return audio_ds
 
-def create_tf_dataset(data, bs=4):
+def create_tf_dataset(data, vectorizer, bs=4):
     """
     創建數據集\n
-    參數：\n
-    data: 數據\n
-    bs: 批次大小
+    參數：
+    - data: 數據
+    - vectorizer: 用於文本向量化的實例
+    - bs: 批次大小
     """
     audio_ds = create_audio_ds(data)
-    text_ds = create_text_ds(data)
+    text_ds = create_text_ds(data, vectorizer)
     # tf.data.Dataset.zip 將兩個數據集合併
     ds = tf.data.Dataset.zip((audio_ds, text_ds))
     # source: 音頻，target: 文本
@@ -143,3 +147,5 @@ def create_tf_dataset(data, bs=4):
     # prefetch 是用來加速數據集的方法，tf.data.AUTOTUNE 表示自動選擇最佳的參數
     ds = ds.prefetch(tf.data.AUTOTUNE)
     return ds
+
+    

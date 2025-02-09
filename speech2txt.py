@@ -25,7 +25,8 @@ def main():
     # 資料中的所有轉錄本均小於 200 個字符
     max_target_len = 200  
     data = pre.get_data(wavs, id2text, maxlen=max_target_len)
-    vectorizer = pre.VectorizeChar(max_target_len)
+    # 初始化 vectorizer
+    vectorizer = pre.VectorizeChar(max_target_len)  
     print("Vocab size", len(vectorizer.get_vocabulary()))
     #print("\n", vectorizer.get_vocabulary())
     #print("\n", len(vectorizer('t')))
@@ -33,8 +34,8 @@ def main():
     split = int(len(data) * 0.99)
     train_data = data[:split]
     test_data = data[split:]
-    ds = pre.create_tf_dataset(train_data, bs=16)
-    val_ds = pre.create_tf_dataset(test_data, bs=4)
+    ds = pre.create_tf_dataset(train_data, vectorizer, bs=16)
+    val_ds = pre.create_tf_dataset(test_data, vectorizer, bs=4)
     print(train_data[0].keys())
     
 if __name__ == "__main__":
