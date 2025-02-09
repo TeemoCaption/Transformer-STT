@@ -6,8 +6,11 @@ import model as md
 import preprocess as pre
 import tensorflow as tf
 
-# 創建文本數據集
+
 def create_text_ds(data):
+    """
+    創建文本數據集
+    """
     texts = ["text" for _ in data]
     text_ds = [vectorizer(t) for t in texts]
     # tf.data.Dataset.from_tensor_slices 創建數據集
@@ -15,7 +18,11 @@ def create_text_ds(data):
     return text_ds
 
 def path_to_audio(path):
-    # 使用 stft 的頻譜圖
+    """
+    將音頻文件轉換為 stft 頻譜圖\n
+    參數：\n
+    path: 音頻文件路徑
+    """
     # tf.io.read_file 讀取音頻文件
     audio = tf.io.read_file(path)
     # tf.audio.decode_wav 解碼音頻文件，1 表示只讀取單聲道
@@ -48,15 +55,37 @@ def path_to_audio(path):
 
     return x
 
-# 創建音頻數據集
 def create_audio_ds(data):
+    """
+    創建音頻數據集\n
+    """
     flist = ["audio" for _ in data]
     # tf.data.Dataset.from_tensor_slices 創建數據集
     audio_ds = tf.data.Dataset.from_tensor_slices(flist)
+    # 使用 map 函數對數據集中的每一個元素進行 path_to_audio 函數的操作
     audio_ds = audio_ds.map(
         path_to_audio, num_parallel_calls=tf.data.AUTOTUNE # 使用多線程加速
     )
     return audio_ds
+
+def create_tf_dataset(data, bs=4):
+    """
+    創建數據集\n
+    參數：\n
+    data: 數據\n
+    bs: 批次大小
+    """
+    audio_ds = create_audio_ds(data)
+    text_ds = create_text_ds(data)
+    # tf.data.Dataset.zip 將兩個數據集合併
+    ds = tf.data.Dataset.zip((audio_ds, text_ds))
+    # source: 音頻，target: 文本
+    ds = ds.map(lambda x, y: {"source": x, "target": y})
+    # batch 是將數據集分成多個批次，每個批次的大小是 bs
+    ds = ds.batch(bs)
+    # prefetch 是用來加速數據集的方法，tf.data.AUTOTUNE 表示自動選擇最佳的參數
+    ds = ds.prefetch(tf.data.AUTOTUNE)
+    return ds
 
 def main():
     path = "./dataset/"
