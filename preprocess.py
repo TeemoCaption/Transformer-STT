@@ -15,9 +15,9 @@ def get_data(wavs, id_to_text, maxlen=50):
     data = []
     #print(maxlen)
     for w in wavs:
-        id = w.split("/")[-1].split(".")[0]
+        id = os.path.basename(w).split(".")[0]
         if len(id_to_text[id]) < maxlen:
-            data.append({"音訊檔名": w, "對應文字": id_to_text[id]})
+            data.append({"音檔路徑": w, "對應文字": id_to_text[id]})
 
     return data
 
@@ -58,6 +58,7 @@ class VectorizeChar:
         return [
             self.char_to_idx.get(ch, 1) for ch in text
         ] + [0] * pad_len
+
 
     def get_vocabulary(self):
         return self.vocab

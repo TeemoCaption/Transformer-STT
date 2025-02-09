@@ -10,7 +10,6 @@ def main():
     path = "./dataset/"
     # 獲取所有的wav文件，recursive 表示是否進行遞迴搜尋
     wavs = glob(path + "wavs/*.wav", recursive=True)
-
     id2text = {}
     with open(os.path.join(path, "metadata.csv"), encoding="utf-8") as f:
         for line in f:
@@ -26,9 +25,8 @@ def main():
     data = pre.get_data(wavs, id2text, maxlen=max_target_len)
     vectorizer = pre.VectorizeChar(max_target_len)
     print("Vocab size", len(vectorizer.get_vocabulary()))
-
-    
-
+    print("WAV files:", wavs)
+    print("\n", data[0])
     
 if __name__ == "__main__":
     main()    
