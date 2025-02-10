@@ -188,15 +188,13 @@ class TransformerDecoder(layers.Layer):
         causal_mask = self.causal_attention_mask(batch_size, seq_len, seq_len, tf.bool)
         target_att = self.self_att(target, target, attention_mask=causal_mask)
 
-        target_norm = self.layernorm1(target + target_att)
-        target_norm = self.self_dropout(target_norm, training=True)
+        target_norm = self.layernorm1(target + self.self_dropout(target_att))
 
-        enc_out_norm = self.layernorm2(enc_out + target_norm)
-        enc_out_norm = self.enc_dropout(enc_out_norm, training=True)
+        enc_out = self.enc_att(target_norm, enc_out)
+        enc_out_norm = self.layernorm2(self.enc_dropout(enc_out) + target_norm)
 
         ffn_out = self.ffn(enc_out_norm)
-        ffn_out_norm = self.layernorm3(ffn_out + enc_out_norm)
-        ffn_out_norm = self.ffn_dropout(ffn_out_norm, training=True)
+        ffn_out_norm = self.layernorm3(self.ffn_dropout(ffn_out) + enc_out_norm)
 
         return ffn_out_norm
 
