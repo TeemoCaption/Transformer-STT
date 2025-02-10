@@ -371,10 +371,10 @@ class Transformer(keras.Model):
         for _ in range(self.target_maxlen - 1):
             dec_out = self.decode(enc, dec_input)
             logits = self.classifier(dec_out)
-            last_logit = tf.argmax(logits[:, -1], axis=-1, output_type=tf.int32)
-            last_logit = tf.expand_dims(last_logit, axis=-1)  # 確保形狀為 [batch_size, 1]
+            logits = tf.argmax(logits, axis=-1, output_type=tf.int32)
+            last_logit = tf.expand_dims(logits[:, -1], axis=-1)
             dec_logits.append(last_logit)
-            dec_input = tf.concat([dec_input, last_logit], axis=-1)  # dec_input: [batch_size, sequence_length]
+            dec_input = tf.concat([dec_input, last_logit], axis=-1)
 
         return dec_input
 
