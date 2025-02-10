@@ -460,9 +460,9 @@ class CustomSchedule(keras.optimizers.schedules.LearningRateSchedule):
         init_lr: 初始學習率\n
         lr_after_warmup: 熱身階段後的學習率\n
         final_lr: 最終學習率\n
-        warmup_epochs: 熱身階段的時期數\n
-        decay_epochs: 衰減階段的時期數\n
-        steps_per_epoch: 每個時期的步數
+        warmup_epochs: 熱身階段的epoch數\n
+        decay_epochs: 衰減階段的epoch數\n
+        steps_per_epoch: 每個epoch的步數
         """
         super().__init__()
         self.init_lr = init_lr
@@ -473,11 +473,18 @@ class CustomSchedule(keras.optimizers.schedules.LearningRateSchedule):
         self.steps_per_epoch = steps_per_epoch
 
     def calculate_lr(self, epoch):
-        """linear warm up + linear decay"""
+        """
+        線性熱身+線性衰減
+        """
+        # 初始學習率 + ((熱身階段後的學習率 - 初始學習率) / (熱身階段 - 1)) * epoch
         warmup_lr = (
             self.init_lr
             + ((self.lr_after_warmup - self.init_lr) / (self.warmup_epochs - 1)) * epoch
         )
+        
+        # 如果 epoch 小於熱身階段，則返回熱身學習率
+        # tf.math.maximum 是取兩個數的最大值
+        # 熱身階段後的學習率 + ((最終學習率 - 熱身階段後的學習率) / (衰減階段)) * (epoch - 熱身階段)
         decay_lr = tf.math.maximum(
             self.final_lr,
             self.lr_after_warmup
@@ -485,5 +492,13 @@ class CustomSchedule(keras.optimizers.schedules.LearningRateSchedule):
             / (self.decay_epochs) * (self.lr_after_warmup - self.final_lr),
         )
 
-        return decay_lr
+        return tf.math.minimum(warmup_lr, decay_lr)
+    
+    def __call__(self, step):
+        """
+        參數：\n
+        step: 步數
+        """
+        epoch = step // self.steps_per_epoch
+        return self.calculate_lr(epoch)
 
