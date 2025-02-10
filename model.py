@@ -373,7 +373,7 @@ class Transformer(keras.Model):
             logits = self.classifier(dec_out)
             last_logit = tf.expand_dims(logits[:, -1], axis=-1)
             dec_logits.append(last_logit)
-            dec_input = tf.concat([dec_input, last_logit], axis=-1)
+            dec_input = tf.concat([dec_input, tf.cast(last_logit, tf.int32)], axis=-1)
 
         return dec_input
 
