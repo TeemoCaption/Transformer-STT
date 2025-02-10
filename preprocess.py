@@ -118,7 +118,7 @@ def create_audio_ds(data):
     """
     創建音頻數據集\n
     """
-    flist = ["audio" for _ in data]
+    flist = [d["audio"] for d in data]
     # tf.data.Dataset.from_tensor_slices 創建數據集
     audio_ds = tf.data.Dataset.from_tensor_slices(flist)
     # 使用 map 函數對數據集中的每一個元素進行 path_to_audio 函數的操作

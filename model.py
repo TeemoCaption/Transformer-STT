@@ -1,5 +1,4 @@
 # model.py
-
 from glob import glob
 import tensorflow as tf
 from tensorflow import keras
@@ -39,7 +38,6 @@ class TokenEmbedding(layers.Layer):
         # 將詞嵌入和位置編碼的結果相加作為最終的輸出
         return x + positions
 
-
 # 對語音特徵進行嵌入處理
 class SpeechFeatureEmbedding(layers.Layer):
     def __init__(self, num_hid=64, maxlen=100):
@@ -73,7 +71,6 @@ class SpeechFeatureEmbedding(layers.Layer):
         x = self.conv1(x)
         x = self.conv2(x)
         return self.conv3(x)
-
 
 # 定義Transformer的編碼器
 class TransformerEncoder(layers.Layer):
@@ -115,7 +112,6 @@ class TransformerEncoder(layers.Layer):
         ffn_output = self.ffn(out1)
         ffn_output = self.dropout2(ffn_output, training=training)
         return self.layernorm2(out1 + ffn_output)
-
 
 # 定義Transformer的解碼器
 class TransformerDecoder(layers.Layer):
@@ -203,7 +199,6 @@ class TransformerDecoder(layers.Layer):
         ffn_out_norm = self.ffn_dropout(ffn_out_norm, training=True)
 
         return ffn_out_norm
-
 
 # 定義Transformer模型
 class Transformer(keras.Model):
@@ -437,8 +432,8 @@ class DisplayOutputs(keras.callbacks.Callback):
             
             print(f"target: {target_text.replace('-', '')}")
             print(f"prediction: {prediction}\n")
-            
 
+# 自訂學習率排程            
 class CustomSchedule(keras.optimizers.schedules.LearningRateSchedule):
     """
     自訂學習率排程\n
