@@ -86,7 +86,7 @@ def main():
     
     model.save_weights(checkpoint_path.format(epoch=15))
     
-    model.fit(ds, validation_data=val_ds, callbacks=[display_cb], epochs=60)
+    model.fit(ds, validation_data=val_ds, callbacks=[display_cb], epochs=1)
     val_loss_value = model.val_loss(batch)  # 呼叫 val_loss 方法
     
     
