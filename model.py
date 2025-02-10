@@ -371,9 +371,10 @@ class Transformer(keras.Model):
         for _ in range(self.target_maxlen - 1):
             dec_out = self.decode(enc, dec_input)
             logits = self.classifier(dec_out)
-            last_logit = tf.expand_dims(logits[:, -1], axis=-1)
+            last_logit = tf.argmax(logits[:, -1], axis=-1, output_type=tf.int32)
+            last_logit = tf.expand_dims(last_logit, axis=-1)  # 確保形狀為 [batch_size, 1]
             dec_logits.append(last_logit)
-            dec_input = tf.concat([dec_input, tf.cast(last_logit, tf.int32)], axis=-1)
+            dec_input = tf.concat([dec_input, last_logit], axis=-1)  # dec_input: [batch_size, sequence_length]
 
         return dec_input
 
@@ -395,7 +396,7 @@ class DisplayOutputs(keras.callbacks.Callback):
         self.batch = batch
         self.target_start_token_idx = target_start_token_idx
         self.target_end_token_idx = target_end_token_idx
-        self.idx2token = idx2token
+        self.idx_to_char = idx2token
         
     # 在每個訓練時期結束時調用
     def on_epoch_end(self, epoch, logs=None):
