@@ -94,8 +94,8 @@ class TransformerEncoder(layers.Layer):
             ]
         )
         # LayerNormalization層，epsilon是一個很小的數，避免分母為0
-        self.layernorm1 = layers.LayerNormalization(epsilon=1e-6)
-        self.layernorm2 = layers.LayerNormalization(epsilon=1e-6)
+        self.layernorm1 = layers.LayerNormalization(epsilon=1e-6, dtype="float32")
+        self.layernorm2 = layers.LayerNormalization(epsilon=1e-6, dtype="float32")
         self.dropout = layers.Dropout(rate)
         self.dropout2 = layers.Dropout(rate)
 
@@ -107,7 +107,7 @@ class TransformerEncoder(layers.Layer):
         training: 是否訓練
         """
         attn_output = self.att(inputs, inputs)
-        out1 = self.layernorm1(inputs + attn_output)
+        out1 = self.layernorm1(tf.cast(inputs, tf.float32) + tf.cast(attn_output, tf.float32))
         out1 = self.dropout(out1, training=training)
         ffn_output = self.ffn(out1)
         ffn_output = self.dropout2(ffn_output, training=training)
@@ -125,9 +125,10 @@ class TransformerDecoder(layers.Layer):
         """
         super().__init__()
         # layer normalization層
-        self.layernorm1 = layers.LayerNormalization(epsilon=1e-6)
-        self.layernorm2 = layers.LayerNormalization(epsilon=1e-6)
-        self.layernorm3 = layers.LayerNormalization(epsilon=1e-6)
+        self.layernorm1 = layers.LayerNormalization(epsilon=1e-6, dtype="float32")
+        self.layernorm2 = layers.LayerNormalization(epsilon=1e-6, dtype="float32")
+        self.layernorm3 = layers.LayerNormalization(epsilon=1e-6, dtype="float32")
+
         # 多頭注意力機制層
         self.self_att = layers.MultiHeadAttention(
             num_heads=num_heads, key_dim=embed_dim
@@ -188,7 +189,7 @@ class TransformerDecoder(layers.Layer):
         causal_mask = self.causal_attention_mask(batch_size, seq_len, seq_len, tf.bool)
         target_att = self.self_att(target, target, attention_mask=causal_mask)
 
-        target_norm = self.layernorm1(target + self.self_dropout(target_att))
+        target_norm = self.layernorm1(tf.cast(target, tf.float32) + self.self_dropout(target_att))
 
         enc_out = self.enc_att(target_norm, enc_out)
         enc_out_norm = self.layernorm2(self.enc_dropout(enc_out) + target_norm)

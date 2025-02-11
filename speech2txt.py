@@ -86,6 +86,7 @@ def main():
     
     # 設定 Mixed Precision 計算
     mixed_precision.set_global_policy("mixed_float16")
+    print(f"Precision Policy: {tf.keras.mixed_precision.global_policy()}")
     
     model.fit(ds, validation_data=val_ds, callbacks=[display_cb], epochs=100)
     
