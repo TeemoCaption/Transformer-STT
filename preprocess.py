@@ -74,8 +74,6 @@ def create_text_ds(data, vectorizer):
     text_ds = tf.data.Dataset.from_tensor_slices(text_ds)
     return text_ds
 
-    return text_ds
-
 def path_to_audio(path):
     """
     將音頻文件轉換為 stft 頻譜圖\n

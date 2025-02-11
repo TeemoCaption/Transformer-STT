@@ -368,7 +368,7 @@ class Transformer(keras.Model):
         dec_input = tf.ones((bs, 1), dtype=tf.int32) * target_start_token_idx
         dec_logits = []
 
-        for _ in range(self.target_maxlen - 1):
+        for i in range(self.target_maxlen - 1):
             dec_out = self.decode(enc, dec_input)
             logits = self.classifier(dec_out)
             logits = tf.argmax(logits, axis=-1, output_type=tf.int32)
@@ -405,7 +405,6 @@ class DisplayOutputs(keras.callbacks.Callback):
         epoch: 訓練時期\n
         logs: 包含模型在該 epoch 中的評估指標（例如損失值）。
         """
-        
         if epoch % 5 != 0:
             return
         source = self.batch["source"]

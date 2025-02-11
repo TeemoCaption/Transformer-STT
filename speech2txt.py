@@ -1,13 +1,10 @@
-# main.py
+# speech2txt.py
 import os 
 import random
 from glob import glob
 import model as md
 import preprocess as pre
 import tensorflow as tf
-
-
-
 
 def main():
     path = "./dataset/"
@@ -130,7 +127,7 @@ def main():
     
     idx_to_char = vectorizer.get_vocabulary()
     for i in range(5):
-        preds = model2.generate(tf.expand_dims(path_to_audio(test_data[i]['audio']), axis=0), target_start_token_idx=2)
+        preds = model2.generate(tf.expand_dims(pre.path_to_audio(test_data[i]['audio']), axis=0), target_start_token_idx=2)
 
         preds = preds.numpy()
 
@@ -143,8 +140,6 @@ def main():
         print(f"actual = {test_data[i]['text']}")
         print(f"predicted = {prediction}")
         print("-----" * 50)
-
-
 
 if __name__ == "__main__":
     main()    
