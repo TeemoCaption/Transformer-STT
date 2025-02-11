@@ -5,6 +5,7 @@ from glob import glob
 import model as md
 import preprocess as pre
 import tensorflow as tf
+from tensorflow.keras import mixed_precision
 
 def main():
     path = "./dataset/"
@@ -81,9 +82,12 @@ def main():
     
     model.compile(optimizer=optimizer, loss=loss_fn)
     
-    model.save_weights(checkpoint_path.format(epoch=15))
+    model.save_weights(checkpoint_path.format(epoch=10))
     
-    model.fit(ds, validation_data=val_ds, callbacks=[display_cb], epochs=60)
+    # 設定 Mixed Precision 計算
+    mixed_precision.set_global_policy("mixed_float16")
+    
+    model.fit(ds, validation_data=val_ds, callbacks=[display_cb], epochs=100)
     
     print("\n", model.val_loss.numpy())
     
