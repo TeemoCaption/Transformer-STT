@@ -44,7 +44,7 @@ def main():
     
     batch = next(iter(ds))
     id2text  = vectorizer.get_vocabulary()
-    display_cb = md.DisplayOutputs(batch, id2text, target_start_token_idx=3)    
+    display_cb = md.DisplayOutputs(batch, id2text, target_start_token_idx=2, target_end_token_idx=3)    
     
     model = md.Transformer(
         num_hid=200, 
