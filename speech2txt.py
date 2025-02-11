@@ -107,6 +107,44 @@ def main():
         print(f"\npredicted = {prediction}")
         print("\n-----" * 10)
 
+    ROOT = os.getcwd()
+    # 模型權重路徑
+    weights_path = os.path.join(ROOT, '/checkpoints/')
+
+    # os.makedirs(weights_path, exist_ok=True)
+    # model.save_weights(weights_path)
+
+    print(os.listdir(weights_path))
+
+    model2 = md.Transformer(
+        num_hid=200,
+        num_head=2,
+        num_feed_forward=400,
+        target_maxlen=max_target_len,
+        num_layers_enc=4,
+        num_layers_dec=1,
+        num_classes=34,
+    )
+    model2.load_weights(weights_path)
+    print(model2.val_loss.numpy())
+    
+    idx_to_char = vectorizer.get_vocabulary()
+    for i in range(5):
+        preds = model2.generate(tf.expand_dims(path_to_audio(test_data[i]['audio']), axis=0), target_start_token_idx=2)
+
+        preds = preds.numpy()
+
+        prediction = ""
+        for idx in preds[0]:
+            prediction += idx_to_char[idx]
+            if idx_to_char[idx] == ">":
+                break
+
+        print(f"actual = {test_data[i]['text']}")
+        print(f"predicted = {prediction}")
+        print("-----" * 50)
+
+
 
 if __name__ == "__main__":
     main()    

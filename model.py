@@ -405,6 +405,7 @@ class DisplayOutputs(keras.callbacks.Callback):
         epoch: 訓練時期\n
         logs: 包含模型在該 epoch 中的評估指標（例如損失值）。
         """
+        
         if epoch % 5 != 0:
             return
         source = self.batch["source"]
