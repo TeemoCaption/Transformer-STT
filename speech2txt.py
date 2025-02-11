@@ -86,10 +86,27 @@ def main():
     
     model.save_weights(checkpoint_path.format(epoch=15))
     
-    model.fit(ds, validation_data=val_ds, callbacks=[display_cb], epochs=1)
-    val_loss_value = model.val_loss(batch)  # 呼叫 val_loss 方法
+    model.fit(ds, validation_data=val_ds, callbacks=[display_cb], epochs=60)
     
+    print("\n", model.val_loss.numpy())
     
+    idx_to_char = vectorizer.get_vocabulary()
+    for i in range(10,15):
+        preds = model.generate(tf.expand_dims(pre.path_to_audio(test_data[i]['audio']), axis=0), target_start_token_idx=2)
+        prediction = ""
+
+        preds = preds.numpy()
+
+        prediction = ""
+        for idx in preds[0]:
+            prediction += idx_to_char[idx]
+            if idx == 3:
+                break
+
+        print(f"\nactual = {test_data[i]['text']}")
+        print(f"\npredicted = {prediction}")
+        print("\n-----" * 10)
+
 
 if __name__ == "__main__":
     main()    
