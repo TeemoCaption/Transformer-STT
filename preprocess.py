@@ -33,9 +33,9 @@ class VectorizeChar:
         """
         # 將英文字母（a-z）轉換為對應的字符，並加入一些特殊字符。
         self.vocab = (
-            ["#", "<", ">", "|"]
+            ["-","#" ,"<", ">"]
             + [chr(i + 96) for i in range(1, 27)]
-            + [".", ",", "!", "?", "-"]
+            + [" ", ".", ",", "?"]
         )
         self.max_len = max_len
         self.char_to_idx = {}
