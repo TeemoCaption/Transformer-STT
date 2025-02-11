@@ -6,6 +6,8 @@ import model as md
 import preprocess as pre
 import tensorflow as tf
 from tensorflow.keras import mixed_precision
+from tensorflow.keras.callbacks import EarlyStopping
+
 
 def main():
     path = "./dataset/"
@@ -69,6 +71,13 @@ def main():
         save_freq=1000
     )
     
+    early_stopping = EarlyStopping(
+        monitor="val_loss",  # 監測驗證集的損失
+        patience=10,         # 若10個 epoch 內沒有改善則停止
+        restore_best_weights=True,  # 停止時回復最佳權重
+        verbose=1            # 顯示早停訊息
+    )
+
     learning_rate = md.CustomSchedule(
         init_lr=0.00001,
         lr_after_warmup=0.001,
@@ -88,7 +97,13 @@ def main():
     mixed_precision.set_global_policy("mixed_float16")
     print(f"Precision Policy: {tf.keras.mixed_precision.global_policy()}")
     
-    model.fit(ds, validation_data=val_ds, callbacks=[display_cb], epochs=100)
+    model.fit(
+        ds, 
+        validation_data=val_ds, 
+        callbacks=[display_cb, early_stopping],  # 加入 early_stopping
+        epochs=200
+    )
+
     
     print("\n", model.val_loss.numpy())
     
