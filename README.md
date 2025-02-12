@@ -2,6 +2,11 @@
 
 這是一個簡單的語音轉文字實作專案，使用 Python 開發。以下是專案的目錄結構以及各個檔案和資料夾的簡要說明。
 
+## 資料集
+
+使用LJ Speech Dataset資料集，網址如下：
+https://keithito.com/LJ-Speech-Dataset/
+
 ## 專案目錄結構
 
 ### 各檔案與資料夾說明
