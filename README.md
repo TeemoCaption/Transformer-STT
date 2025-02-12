@@ -4,7 +4,7 @@
 
 ## 資料集
 
-使用LJ Speech Dataset資料集，網址如下：\n
+使用LJ Speech Dataset資料集，網址如下：<br>
 https://keithito.com/LJ-Speech-Dataset/
 
 ## 專案目錄結構
